@@ -1,0 +1,63 @@
+<main class="page">
+  <header class="page__header">
+    <h1>Image to Text Converter</h1>
+    <p>Завантажте зображення, щоб отримати з нього текст.</p>
+  </header>
+
+  <section class="card">
+    <label
+      class="dropzone"
+      [class.dropzone--active]="dragging()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+    >
+      <input
+        class="dropzone__input"
+        type="file"
+        accept="image/jpeg,image/png"
+        (change)="onFileSelected($event)"
+      />
+      <span class="dropzone__title">Оберіть зображення або перетягніть його сюди</span>
+      <span class="dropzone__hint">JPEG або PNG, до {{ maxSizeMb }} МБ</span>
+    </label>
+
+    @if (error(); as message) {
+      <p class="message message--error" role="alert">{{ message }}</p>
+    }
+
+    @if (previewUrl(); as url) {
+      <figure class="preview">
+        <img class="preview__image" [src]="url" alt="Попередній перегляд завантаженого зображення" />
+        <figcaption class="preview__caption">{{ fileInfo() }}</figcaption>
+      </figure>
+
+      <div class="actions">
+        <button class="button" type="button" [disabled]="loading()" (click)="extractText()">
+          @if (loading()) {
+            <span class="spinner" aria-hidden="true"></span> Розпізнаємо…
+          } @else {
+            Розпізнати текст
+          }
+        </button>
+        <button class="button button--secondary" type="button" (click)="reset()">Очистити</button>
+      </div>
+    }
+  </section>
+
+  @if (text(); as result) {
+    <section class="card" aria-live="polite">
+      <div class="result__header">
+        <h2>Розпізнаний текст</h2>
+        <button class="button button--secondary" type="button" (click)="copyText()">
+          {{ copied() ? 'Скопійовано ✓' : 'Копіювати' }}
+        </button>
+      </div>
+      <pre class="result__text">{{ result }}</pre>
+    </section>
+  } @else if (text() === '') {
+    <section class="card" aria-live="polite">
+      <p class="message">На цьому зображенні тексту не знайдено.</p>
+    </section>
+  }
+</main>
